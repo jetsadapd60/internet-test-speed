@@ -92,55 +92,61 @@ async function runPingTest() {
 async function runDownloadTest() {
   const duration = 10000; // 10s
   const startTime = Date.now();
-  const url = `${config.baseUrl}/download?duration=10`; // Ask server to stream for 10s
+  const concurrency = 3; // Use 3 parallel streams for download
 
-  let loaded = 0;
-  let lastLoaded = 0;
-  let lastTime = startTime;
+  let totalLoaded = 0;
+  const controller = new AbortController();
+
+  // Reporting setup
+  let lastReportTime = startTime;
+  let lastTotalLoaded = 0;
+
+  const reportInterval = setInterval(() => {
+    const now = Date.now();
+    const timeDiff = (now - lastReportTime) / 1000;
+    if (timeDiff > 0.2) {
+      const chunkLoaded = totalLoaded - lastTotalLoaded;
+      const speedMbps = (chunkLoaded * 8) / timeDiff / (1024 * 1024);
+      self.postMessage({
+        type: "progress",
+        phase: "download",
+        value: speedMbps,
+        timestamp: now,
+      });
+      lastTotalLoaded = totalLoaded;
+      lastReportTime = now;
+    }
+  }, 200);
+
+  const downloadTask = async () => {
+    try {
+      const url = `${config.baseUrl}/download?duration=10&t=${Math.random()}`;
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.body) return;
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        totalLoaded += value.length;
+      }
+    } catch (e) {
+      // Ignore abort errors
+    }
+  };
 
   try {
-    const response = await fetch(url);
-    if (!response.body) throw new Error("No response body");
+    const tasks = Array(concurrency)
+      .fill(null)
+      .map(() => downloadTask());
 
-    const reader = response.body.getReader();
+    // Timeout to stop the test
+    setTimeout(() => controller.abort(), duration);
 
-    // Interval for reporting speed
-    const reportInterval = setInterval(() => {
-      const now = Date.now();
-      const timeDiff = (now - lastTime) / 1000; // seconds
-
-      if (timeDiff > 0.2) {
-        // Update every 200ms
-        const chunkLoaded = loaded - lastLoaded;
-        const bitsLoaded = chunkLoaded * 8;
-        const speedMbps = bitsLoaded / timeDiff / (1024 * 1024);
-
-        // Instant speed
-        self.postMessage({
-          type: "progress",
-          phase: "download",
-          value: speedMbps,
-          timestamp: now,
-        });
-
-        lastLoaded = loaded;
-        lastTime = now;
-      }
-    }, 200);
-
-    const checkTimeout = Date.now() + duration;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done || Date.now() > checkTimeout) break;
-      loaded += value.length;
-    }
-
+    await Promise.all(tasks);
     clearInterval(reportInterval);
 
-    // Final Calculation
     const totalTime = (Date.now() - startTime) / 1000;
-    const finalSpeed = (loaded * 8) / totalTime / (1024 * 1024);
+    const finalSpeed = (totalLoaded * 8) / totalTime / (1024 * 1024);
 
     self.postMessage({
       type: "result",
@@ -149,18 +155,19 @@ async function runDownloadTest() {
     });
     self.postMessage({ type: "done", phase: "download" });
   } catch (err: any) {
+    clearInterval(reportInterval);
     self.postMessage({ type: "error", phase: "download", error: err.message });
   }
 }
 
 async function runUploadTest() {
-  const duration = 3000; // 3s upload test
+  const duration = 8000; // 8s upload test
   const startTime = Date.now();
   const endTime = startTime + duration;
   const url = `${config.baseUrl}/upload`;
 
-  // Use smaller chunk to prevent clogging (64KB)
-  const chunkSize = 64 * 1024;
+  // Use larger chunk for high-speed connections (2MB)
+  const chunkSize = 2 * 1024 * 1024;
   const chunk = new Uint8Array(chunkSize);
   crypto.getRandomValues(chunk);
 
@@ -172,18 +179,10 @@ async function runUploadTest() {
   let lastReportTime = startTime;
   let lastBytesSent = 0;
 
-  self.postMessage({ type: "log", message: "Starting Upload Test" });
-
-  const timeout = setTimeout(() => {
-    self.postMessage({ type: "log", message: "Upload timeout fired" });
-    keepGoing = false;
-    controller.abort();
-  }, duration + 500); // Trigger abort slightly after expected end to allow graceful finish
-
   const reportInterval = setInterval(() => {
     const now = Date.now();
     const timeDiff = (now - lastReportTime) / 1000;
-    if (timeDiff > 0.25) {
+    if (timeDiff > 0.2) {
       const diffBytes = bytesSent - lastBytesSent;
       const speedMbps = (diffBytes * 8) / timeDiff / (1024 * 1024);
       self.postMessage({
@@ -195,10 +194,10 @@ async function runUploadTest() {
       lastReportTime = now;
       lastBytesSent = bytesSent;
     }
-  }, 250);
+  }, 200);
 
   try {
-    const concurrency = 2;
+    const concurrency = 4; // Use 4 parallel uploads
     const promises = [];
 
     for (let i = 0; i < concurrency; i++) {
@@ -211,38 +210,32 @@ async function runUploadTest() {
                 body: chunk,
                 cache: "no-store",
                 signal: signal,
+                // Mode 'no-cors' might be slightly faster but we need results
               });
-
-              // Ensure we consume the response to free resources
               await response.text();
-
               if (response.ok) {
                 bytesSent += chunkSize;
               }
             } catch (e: any) {
               if (e.name === "AbortError") break;
-              // Wait a bit on error
-              await new Promise((resolve) => setTimeout(resolve, 50));
+              await new Promise((r) => setTimeout(r, 10));
             }
           }
-          self.postMessage({ type: "log", message: "Upload loop exited" });
         })(),
       );
     }
 
-    await Promise.all(promises);
-    clearTimeout(timeout);
-    clearInterval(reportInterval);
+    // Stop after duration
+    setTimeout(() => {
+      keepGoing = false;
+      controller.abort();
+    }, duration);
 
-    self.postMessage({ type: "log", message: "All upload promises resolved" });
+    await Promise.all(promises);
+    clearInterval(reportInterval);
 
     const totalTime = (Date.now() - startTime) / 1000;
     const finalSpeed = (bytesSent * 8) / totalTime / (1024 * 1024);
-
-    self.postMessage({
-      type: "log",
-      message: `Upload complete: ${bytesSent} bytes in ${totalTime}s = ${finalSpeed} Mbps`,
-    });
 
     self.postMessage({
       type: "result",
@@ -251,9 +244,7 @@ async function runUploadTest() {
     });
     self.postMessage({ type: "done", phase: "upload" });
   } catch (err: any) {
-    clearTimeout(timeout);
     clearInterval(reportInterval);
-    self.postMessage({ type: "log", message: `Upload error: ${err.message}` });
     self.postMessage({ type: "error", phase: "upload", error: err.message });
   }
 }
