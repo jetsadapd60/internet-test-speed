@@ -1,0 +1,94 @@
+{
+  "nav": {
+    "test": "Test",
+    "history": "History",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Internet Speed Test",
+    "subtitle": "Measure your download, upload speed and signal quality",
+    "startButton": "START TEST",
+    "phases": {
+      "idle": "Ready to start test",
+      "ping": "Testing Ping...",
+      "download": "Testing Download...",
+      "upload": "Testing Upload...",
+      "complete": "Test Complete",
+      "error": "Error Occurred"
+    },
+    "metrics": {
+      "currentSpeed": "Current Speed"
+    }
+  },
+  "result": {
+    "title": "Test Results",
+    "healthScore": "Health Score",
+    "labels": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "metrics": {
+      "download": "Download",
+      "upload": "Upload",
+      "ping": "Ping",
+      "jitter": "Jitter"
+    },
+    "buttons": {
+      "backToTest": "Back to Test",
+      "share": "Share Result",
+      "testAgain": "Test Again"
+    },
+    "testInfo": {
+      "title": "Test Information",
+      "testDate": "Test Date:",
+      "testId": "Test ID:"
+    },
+    "shareText": "My Internet Speed:\\n↓ {download} Mbps | ↑ {upload} Mbps | 🏓 {ping}ms\\nHealth Score: {healthScore}/100",
+    "copiedToClipboard": "Result copied to clipboard!",
+    "noResult": "No test result found",
+    "goHome": "Go to Home"
+  },
+  "history": {
+    "title": "Test History",
+    "subtitle": "View your past speed test results",
+    "clearAll": "Clear All",
+    "noHistory": "No test history yet",
+    "runFirstTest": "Run Your First Test",
+    "table": {
+      "dateTime": "Date & Time",
+      "download": "Download",
+      "upload": "Upload",
+      "ping": "Ping",
+      "jitter": "Jitter",
+      "healthScore": "Health Score",
+      "actions": "Actions"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": "Settings",
+    "language": "Language",
+    "comingSoon": "Coming soon..."
+  },
+  "modal": {
+    "clearHistory": {
+      "title": "Clear All History",
+      "description": "Are you sure you want to delete all test results? This action cannot be undone."
+    },
+    "deleteResult": {
+      "title": "Delete Result",
+      "description": "Are you sure you want to delete this test result?"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirm": "Confirm"
+    }
+  },
+  "common": {
+    "mbps": "Mbps",
+    "ms": "ms"
+  }
+}
