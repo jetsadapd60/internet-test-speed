@@ -24,7 +24,14 @@ fi
 # 3. Install Dependencies
 echo "📦 Installing Dependencies (Docker, Nginx, Certbot)..."
 apt update
-apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx git
+# Fix potential dpkg conflicts from previous failed runs
+apt install -y -f
+# Attempt to install with force-overwrite to handle docker-compose plugin conflicts
+apt install -y -o Dpkg::Options::="--force-overwrite" docker.io docker-compose nginx certbot python3-certbot-nginx git || {
+    echo "⚠️  Standard install failed, attempting cleanup..."
+    apt remove -y docker-compose-plugin
+    apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx git
+}
 
 # 4. Prepare Environment
 echo "⚙️  Configuring Environment..."
