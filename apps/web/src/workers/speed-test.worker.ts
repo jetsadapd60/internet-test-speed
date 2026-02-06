@@ -17,12 +17,6 @@ self.onmessage = async (e: MessageEvent) => {
   switch (type) {
     case "config":
       config = payload;
-      // Handle Mixed Content: Upgrade to https/wss if we are in a secure context (HTTPS)
-      if (self.isSecureContext || self.location.protocol === "https:") {
-        if (config.baseUrl.startsWith("http://")) {
-          config.baseUrl = config.baseUrl.replace("http://", "https://");
-        }
-      }
       break;
     case "start-ping":
       await runPingTest();
