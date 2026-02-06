@@ -26,12 +26,14 @@ services:
     container_name: speedtest-api
     environment:
       DATABASE_URL: postgresql://admin:password123@postgres:5432/speedtest_db?schema=public
+      JWT_SECRET: ${JWT_SECRET:-your_secret_key_here}
       PORT: 3000
     ports:
       - "${API_PORT:-3010}:3000"
     depends_on:
       postgres:
         condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && node apps/api/dist/src/main"
     restart: always
 
   web:

@@ -11,6 +11,8 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
   app.useWebSocketAdapter(new WsAdapter(app));
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  console.log(`🚀 API is running on: http://localhost:${port}`);
 }
 void bootstrap();
