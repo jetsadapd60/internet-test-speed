@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile?
+}
+
+model Profile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+}
+
+model TestSession {
+  id         String    @id @default(uuid())
+  userId     String?
+  serverNode String
+  startTime  DateTime  @default(now())
+  endTime    DateTime?
+  status     String    @default("STARTED") // STARTED, COMPLETED, FAILED
+  ipAddress  String?
+  isp        String?
+
+  result TestResult?
+}
+
+model TestResult {
+  id            String      @id @default(uuid())
+  testSessionId String      @unique
+  testSession   TestSession @relation(fields: [testSessionId], references: [id])
+
+  downloadSpeed Float // Mbps
+  uploadSpeed   Float // Mbps
+  ping          Float // ms
+  jitter        Float // ms
+  packetLoss    Float // %
+  healthScore   Int // 0-100 score
+  createdAt     DateTime @default(now())
+}
