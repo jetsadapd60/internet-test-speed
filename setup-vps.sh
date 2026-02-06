@@ -15,7 +15,7 @@ fi
 
 # 2. Get Domain Info
 read -p "Enter your Domain [speed.balldoernsai.cloud]: " DOMAIN
-DOMAIN=${DOMAIN:-speed.balldoernsai.cloud}
+export DOMAIN=${DOMAIN:-speed.balldoernsai.cloud}
 if [ -z "$DOMAIN" ]; then
   echo "Domain is required!"
   exit 1
@@ -27,10 +27,10 @@ apt update
 # Fix potential dpkg conflicts from previous failed runs
 apt install -y -f
 # Attempt to install with force-overwrite to handle docker-compose plugin conflicts
-apt install -y -o Dpkg::Options::="--force-overwrite" docker.io docker-compose nginx certbot python3-certbot-nginx git || {
+apt install -y -o Dpkg::Options::="--force-overwrite" docker.io docker-compose nginx certbot python3-certbot-nginx git gettext-base || {
     echo "⚠️  Standard install failed, attempting cleanup..."
     apt remove -y docker-compose-plugin
-    apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx git
+    apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx git gettext-base
 }
 
 # 4. Prepare Environment
@@ -43,6 +43,7 @@ fi
 
 # Create .env for docker-compose variable substitution
 echo "NEXT_PUBLIC_API_URL=http://${DOMAIN}" > .env
+echo "NEXT_PUBLIC_ENGINE_URL=http://${DOMAIN}" >> .env
 
 # 5. Configure Nginx
 echo "🌐 Configuring Nginx..."
