@@ -32,7 +32,9 @@ self.onmessage = async (e: MessageEvent) => {
 
 async function runPingTest() {
   // Construct WebSocket URL properly
-  let wsUrl = config.baseUrl.replace(/^https?/, (match) =>
+  // Strip /api from the end if it exists, as WS gateway is usually root-invoked or has its own path
+  const kvUrl = config.baseUrl.replace(/\/api\/?$/, "");
+  let wsUrl = kvUrl.replace(/^https?/, (match) =>
     match === "https" ? "wss" : "ws",
   );
 
