@@ -16,6 +16,8 @@ fi
 # 2. Get Domain Info
 read -p "Enter your Domain [speed.balldoernsai.cloud]: " DOMAIN
 export DOMAIN=${DOMAIN:-speed.balldoernsai.cloud}
+export API_PORT=3010
+export WEB_PORT=3011
 if [ -z "$DOMAIN" ]; then
   echo "Domain is required!"
   exit 1
@@ -44,10 +46,12 @@ fi
 # Create .env for docker-compose variable substitution
 echo "NEXT_PUBLIC_API_URL=http://${DOMAIN}" > .env
 echo "NEXT_PUBLIC_ENGINE_URL=http://${DOMAIN}" >> .env
+echo "API_PORT=${API_PORT}" >> .env
+echo "WEB_PORT=${WEB_PORT}" >> .env
 
 # 5. Configure Nginx
 echo "🌐 Configuring Nginx..."
-envsubst '${DOMAIN}' < nginx.conf.template > /etc/nginx/sites-available/speedtest
+envsubst '${DOMAIN} ${API_PORT} ${WEB_PORT}' < nginx.conf.template > /etc/nginx/sites-available/speedtest
 ln -sf /etc/nginx/sites-available/speedtest /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 

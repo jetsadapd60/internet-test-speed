@@ -4,7 +4,7 @@ server {
 
     # Web Frontend
     location / {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://localhost:${WEB_PORT};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -14,7 +14,7 @@ server {
 
     # API Backend
     location /api {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:${API_PORT};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -24,7 +24,7 @@ server {
 
     # WebSocket Ping (Important for Speed Test)
     location /ping {
-        proxy_pass http://localhost:3000/ping;
+        proxy_pass http://localhost:${API_PORT}/ping;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -35,12 +35,12 @@ server {
 
     # Download/Upload Endpoints
     location /download {
-        proxy_pass http://localhost:3000/download;
+        proxy_pass http://localhost:${API_PORT}/download;
         proxy_buffering off;
     }
 
     location /upload {
-        proxy_pass http://localhost:3000/upload;
+        proxy_pass http://localhost:${API_PORT}/upload;
         proxy_request_buffering off;
     }
 }
