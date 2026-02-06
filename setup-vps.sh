@@ -14,7 +14,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 2. Get Domain Info
-read -p "Enter your Domain (e.g. speed.example.com): " DOMAIN
+read -p "Enter your Domain [speed.balldoernsai.cloud]: " DOMAIN
+DOMAIN=${DOMAIN:-speed.balldoernsai.cloud}
 if [ -z "$DOMAIN" ]; then
   echo "Domain is required!"
   exit 1
