@@ -1,5 +1,14 @@
 {
-	"dependencies": {
-		"@prisma/client": "^7.3.0"
-	}
+  "dependencies": {
+    "@prisma/client": "^7.3.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "husky": "^9.1.7"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "pnpm -r lint"
+  }
 }

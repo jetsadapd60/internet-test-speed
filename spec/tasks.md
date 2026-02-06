@@ -9,7 +9,7 @@
 ### 1.1 Project Initialization
 
 - [x] **Setup Mono-repo:** สร้าง Git Repository และกำหนดโครงสร้าง Folder (Apps, Libs, Tools)
-- [ ] **Commit Convention:** ตั้งค่า Husky, Commitlint ให้เป็นมาตรฐานเดียวกัน
+- [x] **Commit Convention:** ตั้งค่า Husky, Commitlint ให้เป็นมาตรฐานเดียวกัน
 - [x] **Dependency Management:** เลือกและติดตั้ง Package Manager (pnpm/yarn) และ Workspace configuration
 
 ### 1.2 Design System Setup (`design-tokens.md`)
