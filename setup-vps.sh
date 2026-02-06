@@ -27,6 +27,26 @@ echo "📦 Installing Dependencies..."
 apt update
 apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx git gettext-base
 
+# 6. SSL Setup (Automated)
+echo "🛡️  Attempting to secure $DOMAIN with SSL..."
+PROTOCOL="http"
+
+# Try to obtain/reinstall SSL certificate non-interactively
+if certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$ROOT_DOMAIN --reinstall || \
+   certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$ROOT_DOMAIN; then
+    PROTOCOL="https"
+    echo "✅ SSL configured successfully!"
+else
+    # Check if a certificate already exists from a previous run
+    if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
+        PROTOCOL="https"
+        echo "✨ Existing SSL detected, using HTTPS."
+    else
+        echo "⚠️  SSL setup skipped or failed. Using HTTP."
+        PROTOCOL="http"
+    fi
+fi
+
 # 7. Generate Production Env with correct Protocol
 echo "⚙️  Finalizing Environment (Protocol: $PROTOCOL)..."
 JWT_SECRET=$(openssl rand -base64 32)
