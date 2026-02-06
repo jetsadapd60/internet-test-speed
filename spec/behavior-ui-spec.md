@@ -32,14 +32,14 @@
 
 ### 2.1 Language Selector Behavior
 
-- **Location:** มุมขวาบนใน Header ติดกับ User Profile/Settings
+- **Location:** มุมขวาบนใน Header
 - **Display:**
-  - แสดงเป็น Toggle (TH/EN) หรือ Dropdown พร้อมไอคอนธงชาติหรือรหัสภาษา
+  - แสดงเป็น Toggle (TH/EN) พร้อมไอคอนธงชาติ
   - ภาษาปัจจุบันจะถูก Highlight ด้วยสี `Brand Primary`
 - **Interaction:**
   - **Click:** เปลี่ยนภาษาทันที โดยไม่ต้อง Reload หน้า
   - **Animation:** Content Fade out → Switch → Fade in (ระยะเวลา 200ms)
-  - **Persistence:** บันทึกค่าการเลือกภาษาใน LocalStorage หรือ User Preferences (ถ้า Login)
+  - **Persistence:** บันทึกค่าการเลือกภาษาใน localStorage
 
 ### 2.2 Content Localization
 

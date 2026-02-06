@@ -1,37 +1,15 @@
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: speedtest-postgres
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: speedtest_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d speedtest_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     container_name: speedtest-api
     environment:
-      DATABASE_URL: postgresql://admin:password123@postgres:5432/speedtest_db?schema=public
-      JWT_SECRET: ${JWT_SECRET:-your_secret_key_here}
       PORT: 3000
+      NODE_ENV: production
     ports:
       - "${API_PORT:-3010}:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    command: sh -c "pnpm --filter api exec prisma migrate deploy --schema prisma/schema.prisma && node apps/api/dist/src/main"
+    command: node apps/api/dist/src/main
     restart: always
 
   web:
@@ -50,6 +28,3 @@ services:
     depends_on:
       - api
     restart: always
-
-volumes:
-  postgres_data:

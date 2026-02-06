@@ -1,118 +1,162 @@
-# Detailed Implementation Tasks (แผนงานและรายการสิ่งที่ต้องทำ)
+# Detailed Implementation Tasks
 
-เอกสารนี้รวบรวม Task ทั้งหมดสำหรับการพัฒนาระบบ Internet Quality Intelligence App ตาม Specification ที่ระบุไว้
-
----
-
-## **Phase 1: Foundation & DevOps Setup (การเตรียมพื้นฐานและระบบ DevOps)**
-
-### 1.1 Project Initialization
-
-- [x] **Setup Mono-repo:** สร้าง Git Repository และกำหนดโครงสร้าง Folder (Apps, Libs, Tools)
-- [x] **Commit Convention:** ตั้งค่า Husky, Commitlint ให้เป็นมาตรฐานเดียวกัน
-- [x] **Dependency Management:** เลือกและติดตั้ง Package Manager (pnpm/yarn) และ Workspace configuration
-
-### 1.2 Design System Setup (`design-tokens.md`)
-
-- [x] **Define Tokens:** สร้างไฟล์ Config (JSON/TS) สำหรับ Design Tokens (Colors, Typography, Spacing)
-- [x] **Setup CSS Library:** ติดตั้ง TailwindCSS หรือ Global CSS Variables ตาม Tokens
-- [x] **Component: Button:** สร้าง Base Button Component (Primary, Ghost, Disabled states)
-- [x] **Component: Card:** สร้าง Glassmorphism Card Component
-- [x] **Component: Typography:** สร้าง Text Components (H1, H2, Body, Caption)
-
-### 1.3 DevOps & CI/CD
-
-- [x] **CI Pipeline:** สร้าง GitHub Actions workflow สำหรับ Run Test & Lint
-- [x] **Containerization:** เขียน `Dockerfile` สำหรับ Web Client และ Backend Service
-- [x] **Vercel/Cloud Init:** Setup Project บน Hosting Platform (Staging Env)
+เอกสารนี้รวบรวม Task สำหรับการพัฒนาระบบ Internet Speed Test App (Simplified Architecture)
 
 ---
 
-## **Phase 2: Core Backend Services (ระบบหลังบ้านหลัก)**
+## **Phase 1: Foundation & Setup**
 
-### 2.1 Auth & User Service
+### 1.1 Project Structure
 
-- [x] **Database Schema:** ออกแบบ Table Users, Profiles
-- [x] **API: Register:** สร้าง Endpoint สำหรับสมัครสมาชิก (Email/Password)
-- [x] **API: Login:** สร้าง Endpoint สำหรับเข้าสู่ระบบ และออก JWT Token
-- [x] **Middleware:** สร้าง Auth Guard สำหรับ Protect Private Routes
+- [x] Setup Mono-repo with pnpm workspace
+- [x] Configure Git with commit conventions (Husky + Commitlint)
+- [x] Create Next.js web app
+- [x] Create NestJS API app
 
-### 2.2 Test Session Service
+### 1.2 Design System
 
-- [x] **Session Schema:** ออกแบบ Table TestSessions เก็บ Session ID, UserID, StartTime
-- [x] **API: Start Session:** endpoint ขอเริ่มเทส (return session_token + edge server info)
-- [x] **Logic: Server Selector:** เขียน Algorithm เลือก Edge Server ที่ใกล้ที่สุด (GeoIP หรือ Ping Check)
+- [x] Define Design Tokens (Colors, Typography, Spacing)
+- [x] Setup TailwindCSS
+- [x] Create Button Component
+- [x] Create Card Component (Glassmorphism)
+- [x] Create Typography Components
 
-### 2.3 Result Processing
+### 1.3 DevOps
 
-- [x] **Metrics Schema:** ออกแบบ Time-series Schema (InfluxDB/Timescale) เก็บค่า Ping, Speed (Raw Data)
-- [x] **API: Submit Result:** Endpoint รับค่าผลการทดสอบจาก Client
-- [x] **Validation Logic:** ตรวจสอบความถูกต้องของข้อมูล (Sanity Check) ก่อนบันทึก
-- [x] **Score Calculation:** เขียน Function คำนวณ Health Score (0-100) จากค่าที่ส่งมา
-
----
-
-## **Phase 3: Edge Server Implementation (ระบบเซิร์ฟเวอร์ทดสอบ)**
-
-### 3.1 Speed Test Engine
-
-- [x] **Go/Rust Service:** ขึ้นโครงสร้าง Service ประสิทธิภาพสูง
-- [x] **Endpoint: Download/Upload:** สร้าง Route สำหรับ Stream Data (TCP/HTTP)
-- [x] **Socket Implementation:** จัดการ WebSocket สำหรับ Real-time Latency measuring
-
-### 3.2 Deployment & Network
-
-- [x] **Server Tuning:** ปรับ Kernel Parameter (sysctl) รองรับ Connection จำนวนมาก
-- [x] **Load Balancing Strategy:** config NGINX/Envoy หน้า Edge Server
+- [x] Create Dockerfile for web and api
+- [x] Create docker-compose.yml
+- [x] Setup CI/CD with GitHub Actions
 
 ---
 
-## **Phase 4: Client Application (Web App)**
+## **Phase 2: Minimal Backend API**
 
-### 4.1 UI Implementation (`design.md` & `behavior.md`)
+### 2.1 Core API Endpoints
 
-- [x] **Landing Page:** Implement Hero Section และปุ่ม Start ที่มี Animation
-- [x] **Layout:** สร้าง Main Layout (Navbar, Footer, Container)
-- [x] **Anim: Speed Gauge:** สร้าง Custom Gauge Component หรือใช้ Library ที่ปรับแต่งได้
-- [x] **Anim: Graph:** Implement Real-time Line Chart component
+- [ ] **Remove all database-related code**
+  - [ ] Delete `apps/api/prisma/` directory
+  - [ ] Delete `apps/api/src/prisma.service.ts`
+  - [ ] Remove Prisma from `apps/api/package.json`
 
-### 4.2 Test Logic Integration
+- [ ] **Remove authentication system**
+  - [ ] Delete `apps/api/src/auth/` module
+  - [ ] Delete `apps/api/src/users/` module
+  - [ ] Remove auth dependencies
 
-- [x] **Worker Thread:** ย้าย Logic การโหลดไฟล์ (Download/Upload) ไปรันใน Web Worker
-- [x] **Ping Logic:** เขียน Function วัด Latency ผ่าน WebSocket หรือ Fetch
-- [x] **State Management:** จัดการ State (Idle -> Testing -> Result)
+- [ ] **Simplify app structure**
+  - [ ] Update `apps/api/src/app.module.ts` (keep SpeedTestModule only)
+  - [ ] Update `apps/api/src/main.ts` (remove DB/auth config)
 
-### 4.3 Internationalization (i18n)
-
-- [ ] **i18n Setup:** ติดตั้งและ Config Library (next-i18next, react-intl หรือเทียบเท่า)
-- [ ] **Translation Files:** สร้างไฟล์แปลภาษา (JSON/YAML) สำหรับ TH และ EN
-  - [ ] Common UI (ปุ่ม, Label, Navigation)
-  - [ ] Speed Test Flow (Idle, Testing, Result states)
-  - [ ] Scenario Mode (Gaming, Streaming, Work from Home)
-  - [ ] History & Profile Pages
-  - [ ] Error Messages & Notifications
-- [ ] **Language Switcher Component:** สร้าง UI Component สำหรับเปลี่ยนภาษา
-- [ ] **Locale Detection:** ตรวจจับภาษาจาก Browser หรือ User Settings
-- [ ] **Persistence:** บันทึกค่าภาษาที่เลือกใน LocalStorage/Database
-- [ ] **Dynamic Content:** แปล Insights และ Recommendations ตามภาษา
-- [ ] **Number & Date Formatting:** ปรับรูปแบบตัวเลขและวันที่ตามภาษา
-
-### 4.4 Result & History
-
-- [x] **Result Page:** แสดง Health Score และ Summary Cards
-- [x] **History Page:** ดึง API ประวัติการทดสอบมาแสดงแบบ Table/List
-- [x] **User Profile:** หน้าแก้ไขข้อมูลส่วนตัว
+- [x] **Speed Test Endpoints** (already implemented)
+  - [x] `GET /api/download` - Stream random data
+  - [x] `POST /api/upload` - Receive and discard data
+  - [x] `WS /ping` - WebSocket latency measurement
 
 ---
 
-## **Phase 5: Testing & QA (การทดสอบและประกันคุณภาพ)**
+## **Phase 3: Frontend Development**
 
-### 5.1 Automated Testing
+### 3.1 localStorage Service
 
-- [x] **Unit Test:** เขียน Test ครอบคลุม Core Logic (Calculation, Validation)
-- [x] **E2E Test:** ใช้ Playwright/Cypress จำลอง User Flow (Start Test -> View Result)
+- [ ] **Create storage utility**
+  - [ ] `saveResult()` - Save test result
+  - [ ] `getHistory()` - Load all results
+  - [ ] `deleteResult(id)` - Delete single result
+  - [ ] `clearAll()` - Clear all history
+  - [ ] `exportJSON()` - Export as JSON
+  - [ ] `exportCSV()` - Export as CSV
+  - [ ] Storage limit handling (max 1000 results)
 
-### 5.2 Performance Testing
+### 3.2 API Client Simplification
 
-- [ ] **Load Test Backend:** ยิง Request ถล่ม API เพื่อวัด Throughput
-- [ ] **Bandwidth Simulation:** จำลอง Network แย่ๆ (High Latency, Packet Loss) ดูการตอบสนองของ App
+- [ ] Remove authentication-related API calls
+- [ ] Remove test session API calls
+- [ ] Keep only speed test endpoints
+
+### 3.3 Pages
+
+- [x] **Home Page** (Speed Test UI - existing)
+- [x] **Result Page** (existing, needs update)
+  - [ ] Update to save results to localStorage
+  - [ ] Remove API calls to backend
+- [x] **History Page** (existing, needs update)
+  - [ ] Update to load from localStorage
+  - [ ] Add export buttons (CSV/JSON)
+  - [ ] Add delete confirmation dialog
+  - [ ] Add clear all button
+- [ ] **Remove Profile Page** (no longer needed)
+
+### 3.4 Components
+
+- [x] Speed Gauge (existing)
+- [x] Graph/Chart components (existing)
+- [ ] Export buttons
+- [ ] Delete confirmation modal
+- [ ] Storage usage indicator
+
+### 3.5 Internationalization (i18n)
+
+- [ ] Setup i18n library (next-i18next)
+- [ ] Create translation files (TH, EN)
+  - [ ] Common UI elements
+  - [ ] Speed test flow
+  - [ ] History page
+  - [ ] Error messages
+- [ ] Language switcher component
+- [ ] Persist language choice in localStorage
+
+---
+
+## **Phase 4: Infrastructure Updates**
+
+### 4.1 Docker Configuration
+
+- [ ] **Update `docker-compose.full.yml`**
+  - [ ] Remove `postgres` service
+  - [ ] Remove DATABASE_URL from api service
+  - [ ] Remove migration commands
+  - [ ] Simplify api startup command
+
+### 4.2 Root Dependencies
+
+- [ ] Remove `@prisma/client` from root `package.json`
+- [ ] Remove `prisma` from root `package.json`
+- [ ] Regenerate `pnpm-lock.yaml`
+
+---
+
+## **Phase 5: Testing & Verification**
+
+### 5.1 Backend Tests
+
+- [ ] Test `/api/download` endpoint
+- [ ] Test `/api/upload` endpoint
+- [ ] Test `/ping` WebSocket endpoint
+- [ ] Verify no database dependencies remain
+
+### 5.2 Frontend Tests
+
+- [ ] Test speed test flow (Ping → Download → Upload)
+- [ ] Test localStorage save/load
+- [ ] Test export functionality (CSV/JSON)
+- [ ] Test delete/clear functionality
+- [ ] Cross-browser testing (Chrome, Firefox, Safari)
+
+### 5.3 Deployment
+
+- [ ] Docker build succeeds without database
+- [ ] Application starts successfully
+- [ ] All features work on VPS
+- [ ] HTTPS/SSL configured correctly
+
+---
+
+## **Phase 6: Documentation**
+
+- [x] Update `spec/spec.md`
+- [x] Update `spec/system-architecture-spec.md`
+- [x] Update `spec/tasks.md`
+- [ ] Update `spec/behavior-ui-spec.md`
+- [ ] Create deployment guide
+- [ ] Create user guide
+- [ ] Update README.md
