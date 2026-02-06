@@ -31,7 +31,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "./node_modules/.bin/prisma migrate deploy --schema apps/api/prisma/schema.prisma && node apps/api/dist/src/main"
+    command: sh -c "pnpm --filter api exec prisma migrate deploy --schema prisma/schema.prisma && node apps/api/dist/src/main"
     restart: always
 
   web:

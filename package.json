@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@prisma/client": "^6.4.1"
+    "@prisma/client": "^6.4.1",
+    "prisma": "^6.4.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",
