@@ -15,8 +15,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@prisma/client": ["../../node_modules/@prisma/client"],
-      ".prisma/client/*": ["../../node_modules/.pnpm/@prisma+client@7.3.0_prisma@7.3.0_@types+react@19.2.13_react-dom@19.2.3_react@19.2.3__r_eaf57651660d6e36b39d948e8a727bd3/node_modules/.prisma/client/*"]
+      "@/*": ["src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
