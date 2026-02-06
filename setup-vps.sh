@@ -62,6 +62,9 @@ else
     DOCKER_COMPOSE="docker compose"
 fi
 
+# Stop existing containers to free up ports
+$DOCKER_COMPOSE -f docker-compose.full.yml down --remove-orphans || true
+
 $DOCKER_COMPOSE -f docker-compose.full.yml up --build -d
 
 # 7. SSL Setup (Optional but Recommended)
