@@ -56,7 +56,13 @@ systemctl restart nginx
 
 # 6. Run Platform
 echo "🐳 Starting Containers..."
-docker-compose -f docker-compose.full.yml up --build -d
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+else
+    DOCKER_COMPOSE="docker compose"
+fi
+
+$DOCKER_COMPOSE -f docker-compose.full.yml up --build -d
 
 # 7. SSL Setup (Optional but Recommended)
 read -p "Do you want to setup SSL (HTTPS) now? (y/n): " SETUP_SSL
