@@ -52,12 +52,12 @@ server {
 
     # Download/Upload Endpoints
     location /download {
-        proxy_pass http://localhost:${API_PORT}/download;
+        proxy_pass http://localhost:${API_PORT}/api/download;
         proxy_buffering off;
     }
 
     location /upload {
-        proxy_pass http://localhost:${API_PORT}/upload;
+        proxy_pass http://localhost:${API_PORT}/api/upload;
         proxy_request_buffering off;
     }
 }
