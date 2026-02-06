@@ -27,8 +27,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
 
-# Generate Prisma Client
-RUN cd apps/api && npx prisma generate
+# Generate Prisma Client (Use local binary to avoid Prisma 7 ghosting)
+RUN cd apps/api && ../../node_modules/.bin/prisma generate
 
 # Build the api app
 RUN pnpm --filter api build
@@ -53,9 +53,8 @@ COPY apps/api/prisma ./apps/api/prisma
 # Install production dependencies only
 RUN pnpm install --filter api --prod --frozen-lockfile --ignore-scripts
 
-# Generate Prisma Client (needed for runtime)
-# ignoring scripts above to prevent potential postinstall issues, explicitly running prisma generate
-RUN cd apps/api && npx prisma generate
+# Generate Prisma Client (needed for runtime, using local binary)
+RUN cd apps/api && ../../node_modules/.bin/prisma generate
 
 # Copy built artifacts
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
