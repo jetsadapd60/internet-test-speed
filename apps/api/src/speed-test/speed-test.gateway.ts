@@ -14,13 +14,13 @@ export class SpeedTestGateway
   server: Server;
 
   handleConnection(client: WebSocket) {
-    client.on('message', (message: any) => {
+    client.on('message', (message: Buffer) => {
       // Raw echo back
       client.send(message.toString());
     });
   }
 
-  handleDisconnect(client: WebSocket) {
+  handleDisconnect() {
     // Cleanup if needed
   }
 }

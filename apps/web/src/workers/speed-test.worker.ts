@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-globals */
-
 // Speed Test Worker
 // Handles Ping (WS), Download (Fetch/Stream), and Upload (XHR/Fetch)
 
@@ -49,10 +47,8 @@ async function runPingTest() {
   const pings: number[] = [];
   const maxPings = 10;
   let completed = 0;
-  let connectionTimeout: ReturnType<typeof setTimeout>;
-
   // Add connection timeout
-  connectionTimeout = setTimeout(() => {
+  const connectionTimeout = setTimeout(() => {
     if (ws.readyState !== WebSocket.OPEN) {
       ws.close();
       self.postMessage({
@@ -98,8 +94,8 @@ async function runPingTest() {
     setTimeout(sendPing, 100);
   };
 
-  ws.onerror = (e) => {
-    clearTimeout(connectionTimeout);
+  ws.onerror = () => {
+    if (connectionTimeout) clearTimeout(connectionTimeout);
     self.postMessage({
       type: "error",
       phase: "ping",
@@ -160,7 +156,7 @@ async function runDownloadTest() {
         if (done) break;
         totalLoaded += value.length;
       }
-    } catch (e) {
+    } catch {
       // Ignore abort errors
     }
   };
@@ -185,9 +181,10 @@ async function runDownloadTest() {
       data: { speed: finalSpeed },
     });
     self.postMessage({ type: "done", phase: "download" });
-  } catch (err: any) {
+  } catch (err: unknown) {
     clearInterval(reportInterval);
-    self.postMessage({ type: "error", phase: "download", error: err.message });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    self.postMessage({ type: "error", phase: "download", error: errorMessage });
   }
 }
 
@@ -253,8 +250,8 @@ async function runUploadTest() {
               if (response.ok) {
                 bytesSent += chunkSize;
               }
-            } catch (e: any) {
-              if (e.name === "AbortError") break;
+            } catch (err: unknown) {
+              if (err instanceof Error && err.name === "AbortError") break;
               await new Promise((r) => setTimeout(r, 10));
             }
           }
@@ -280,9 +277,10 @@ async function runUploadTest() {
       data: { speed: finalSpeed },
     });
     self.postMessage({ type: "done", phase: "upload" });
-  } catch (err: any) {
+  } catch (err: unknown) {
     clearInterval(reportInterval);
-    self.postMessage({ type: "error", phase: "upload", error: err.message });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    self.postMessage({ type: "error", phase: "upload", error: errorMessage });
   }
 }
 

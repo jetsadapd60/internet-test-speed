@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, History, User } from "lucide-react";
+import { Activity, History } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export function Navbar() {

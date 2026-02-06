@@ -1,0 +1,66 @@
+
+> web@0.1.0 lint /Users/jet-dev/Documents/test-speed/apps/web
+> eslint
+
+
+/Users/jet-dev/Documents/test-speed/apps/web/src/app/history/page.tsx
+  17:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/jet-dev/Documents/test-speed/apps/web/src/app/history/page.tsx:17:5
+  15 |   useEffect(() => {
+  16 |     // Load history from storage service
+> 17 |     setHistory(storage.getHistory());
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |   }, []);
+  19 |
+  20 |   /* Modal State */  react-hooks/set-state-in-effect
+
+/Users/jet-dev/Documents/test-speed/apps/web/src/components/navbar.tsx
+  2:29  warning  'User' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/jet-dev/Documents/test-speed/apps/web/src/hooks/use-speed-test.ts
+   19:10  warning  'progress' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   19:20  warning  'setProgress' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   84:11  error    Error: Cannot access variable before it is declared
+
+`handlePhaseCompletion` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/Users/jet-dev/Documents/test-speed/apps/web/src/hooks/use-speed-test.ts:84:11
+  82 |
+  83 |         case "done":
+> 84 |           handlePhaseCompletion(workerPhase);
+     |           ^^^^^^^^^^^^^^^^^^^^^ `handlePhaseCompletion` accessed before it is declared
+  85 |           break;
+  86 |
+  87 |         case "error":
+
+/Users/jet-dev/Documents/test-speed/apps/web/src/hooks/use-speed-test.ts:103:3
+  101 |   }, []);
+  102 |
+> 103 |   const handlePhaseCompletion = (completedPhase: string) => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 104 |     if (completedPhase === "ping") {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 105 |       setPhase("download");
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 114 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 115 |   };
+      | ^^^^^ `handlePhaseCompletion` is declared here
+  116 |
+  117 |   const handleComplete = () => {
+  118 |     setPhase("complete");  react-hooks/immutability
+  101:6   warning  React Hook useEffect has a missing dependency: 'handlePhaseCompletion'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/exhaustive-deps
+
+✖ 6 problems (2 errors, 4 warnings)
+
+/Users/jet-dev/Documents/test-speed/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  web@0.1.0 lint: `eslint`
+Exit status 1

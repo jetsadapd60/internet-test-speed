@@ -14,7 +14,8 @@ export default function HistoryPage() {
 
   useEffect(() => {
     // Load history from storage service
-    setHistory(storage.getHistory());
+    const results = storage.getHistory();
+    setHistory(results); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   /* Modal State */

@@ -16,7 +16,6 @@ interface GraphPoint {
 
 export function useSpeedTest() {
   const [phase, setPhase] = useState<TestPhase>("idle");
-  const [progress, setProgress] = useState(0); // 0-100 overall
   const [realtimeSpeed, setRealtimeSpeed] = useState(0); // Current Mbps for Gauge
   const [results, setResults] = useState<TestResult>({
     ping: 0,
@@ -26,6 +25,28 @@ export function useSpeedTest() {
   });
   const [graphData, setGraphData] = useState<GraphPoint[]>([]);
   const workerRef = useRef<Worker | null>(null);
+
+  const handleComplete = useCallback(() => {
+    setPhase("complete");
+    setRealtimeSpeed(0);
+  }, []);
+
+  const handlePhaseCompletion = useCallback(
+    (completedPhase: string) => {
+      if (completedPhase === "ping") {
+        setPhase("download");
+        setGraphData([]); // Clear graph for next phase
+        workerRef.current?.postMessage({ type: "start-download" });
+      } else if (completedPhase === "download") {
+        setPhase("upload");
+        setGraphData([]);
+        workerRef.current?.postMessage({ type: "start-upload" });
+      } else if (completedPhase === "upload") {
+        handleComplete();
+      }
+    },
+    [handleComplete],
+  );
 
   useEffect(() => {
     // Initialize Worker
@@ -98,26 +119,7 @@ export function useSpeedTest() {
     return () => {
       workerRef.current?.terminate();
     };
-  }, []);
-
-  const handlePhaseCompletion = (completedPhase: string) => {
-    if (completedPhase === "ping") {
-      setPhase("download");
-      setGraphData([]); // Clear graph for next phase
-      workerRef.current?.postMessage({ type: "start-download" });
-    } else if (completedPhase === "download") {
-      setPhase("upload");
-      setGraphData([]);
-      workerRef.current?.postMessage({ type: "start-upload" });
-    } else if (completedPhase === "upload") {
-      handleComplete();
-    }
-  };
-
-  const handleComplete = () => {
-    setPhase("complete");
-    setRealtimeSpeed(0);
-  };
+  }, [handlePhaseCompletion]);
 
   const startTest = useCallback(() => {
     if (!workerRef.current) return;
