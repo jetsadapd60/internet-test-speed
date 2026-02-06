@@ -92,7 +92,7 @@ async function runPingTest() {
 async function runDownloadTest() {
   const duration = 10000; // 10s
   const startTime = Date.now();
-  const concurrency = 3; // Use 3 parallel streams for download
+  const concurrency = 10; // Use 10 parallel streams for download
 
   let totalLoaded = 0;
   const controller = new AbortController();
@@ -169,7 +169,13 @@ async function runUploadTest() {
   // Use larger chunk for high-speed connections (2MB)
   const chunkSize = 2 * 1024 * 1024;
   const chunk = new Uint8Array(chunkSize);
-  crypto.getRandomValues(chunk);
+
+  // crypto.getRandomValues has a limit of 64KB per call
+  const maxSafeSize = 65536;
+  for (let i = 0; i < chunkSize; i += maxSafeSize) {
+    const size = Math.min(maxSafeSize, chunkSize - i);
+    crypto.getRandomValues(chunk.subarray(i, i + size));
+  }
 
   const controller = new AbortController();
   const signal = controller.signal;
@@ -197,7 +203,7 @@ async function runUploadTest() {
   }, 200);
 
   try {
-    const concurrency = 4; // Use 4 parallel uploads
+    const concurrency = 10; // Use 10 parallel uploads
     const promises = [];
 
     for (let i = 0; i < concurrency; i++) {
