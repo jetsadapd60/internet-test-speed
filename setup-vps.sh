@@ -27,6 +27,22 @@ echo "📦 Installing Dependencies..."
 apt update
 apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx git gettext-base
 
+# 4. Clean up old configs to avoid conflicts
+echo "🧹 Cleaning up old Nginx configs..."
+rm -f /etc/nginx/sites-enabled/speedtest
+rm -f /etc/nginx/sites-enabled/speedtest-le-ssl.conf
+rm -f /etc/nginx/sites-available/speedtest
+rm -f /etc/nginx/sites-available/speedtest-le-ssl.conf
+
+# 5. Base Nginx Config (HTTP)
+echo "🌐 Setting up base Nginx config..."
+envsubst '${DOMAIN} ${API_PORT} ${WEB_PORT}' < nginx.conf.template > /etc/nginx/sites-available/speedtest
+ln -sf /etc/nginx/sites-available/speedtest /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+
+nginx -t
+systemctl restart nginx
+
 # 6. SSL Setup (Automated)
 echo "🛡️  Attempting to secure $DOMAIN with SSL..."
 PROTOCOL="http"
