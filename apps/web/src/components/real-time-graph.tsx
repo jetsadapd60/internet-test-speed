@@ -14,8 +14,8 @@ interface RealTimeGraphProps {
 
 export function RealTimeGraph({ data, color = "#0ea5e9" }: RealTimeGraphProps) {
   return (
-    <div className="h-[200px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-full w-full">
+      <ResponsiveContainer width="100%" height="100%" minHeight={150}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">

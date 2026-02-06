@@ -39,14 +39,38 @@ self.onmessage = async (e: MessageEvent) => {
 };
 
 async function runPingTest() {
-  const wsUrl = config.baseUrl.replace(/^http/, "ws") + "/ping";
+  // Construct WebSocket URL properly
+  let wsUrl = config.baseUrl.replace(/^https?/, (match) =>
+    match === "https" ? "wss" : "ws",
+  );
+
+  // Ensure /ping path is added correctly
+  if (!wsUrl.endsWith("/")) {
+    wsUrl += "/";
+  }
+  wsUrl += "ping";
+
   const ws = new WebSocket(wsUrl);
 
   const pings: number[] = [];
   const maxPings = 10;
   let completed = 0;
+  let connectionTimeout: ReturnType<typeof setTimeout>;
+
+  // Add connection timeout
+  connectionTimeout = setTimeout(() => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      ws.close();
+      self.postMessage({
+        type: "error",
+        phase: "ping",
+        error: "WebSocket connection timeout",
+      });
+    }
+  }, 10000); // 10 second timeout
 
   ws.onopen = () => {
+    clearTimeout(connectionTimeout);
     sendPing();
   };
 
@@ -81,11 +105,24 @@ async function runPingTest() {
   };
 
   ws.onerror = (e) => {
+    clearTimeout(connectionTimeout);
     self.postMessage({
       type: "error",
       phase: "ping",
-      error: "WebSocket connection failed",
+      error:
+        "WebSocket connection failed - Please check your internet connection",
     });
+  };
+
+  ws.onclose = (e) => {
+    clearTimeout(connectionTimeout);
+    if (completed < maxPings && e.code !== 1000) {
+      self.postMessage({
+        type: "error",
+        phase: "ping",
+        error: `WebSocket closed unexpectedly (code: ${e.code})`,
+      });
+    }
   };
 }
 
