@@ -14,14 +14,13 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 2. Get Domain Info
-read -p "Enter your Domain [speed.balldoernsai.cloud]: " DOMAIN
-export DOMAIN=${DOMAIN:-speed.balldoernsai.cloud}
+export DOMAIN=${1:-speed.balldoernsai.cloud}
 export API_PORT=3010
 export WEB_PORT=3011
-if [ -z "$DOMAIN" ]; then
-  echo "Domain is required!"
-  exit 1
-fi
+
+echo "🌐 Using Domain: $DOMAIN"
+echo "🔌 API Port: $API_PORT"
+echo "🌐 Web Port: $WEB_PORT"
 
 # 3. Install Dependencies
 echo "📦 Installing Dependencies (Docker, Nginx, Certbot)..."
