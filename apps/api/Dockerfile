@@ -11,7 +11,6 @@ RUN npm install -g pnpm
 # Copy package.json files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/package.json
-COPY apps/api/prisma ./apps/api/prisma
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -26,8 +25,6 @@ RUN npm install -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
-
-
 
 # Build the api app
 RUN pnpm --filter api build
@@ -47,12 +44,9 @@ RUN adduser --system --uid 1001 nestjs
 # Copy definition files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/package.json
-COPY apps/api/prisma ./apps/api/prisma
 
 # Install production dependencies only
 RUN pnpm install --filter api --prod --frozen-lockfile --ignore-scripts
-
-
 
 # Copy built artifacts
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
