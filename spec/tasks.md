@@ -33,19 +33,19 @@
 
 ### 2.1 Core API Endpoints
 
-- [ ] **Remove all database-related code**
-  - [ ] Delete `apps/api/prisma/` directory
-  - [ ] Delete `apps/api/src/prisma.service.ts`
-  - [ ] Remove Prisma from `apps/api/package.json`
+- [x] **Remove all database-related code**
+  - [x] Delete `apps/api/prisma/` directory
+  - [x] Delete `apps/api/src/prisma.service.ts`
+  - [x] Remove Prisma from `apps/api/package.json`
 
-- [ ] **Remove authentication system**
-  - [ ] Delete `apps/api/src/auth/` module
-  - [ ] Delete `apps/api/src/users/` module
-  - [ ] Remove auth dependencies
+- [x] **Remove authentication system**
+  - [x] Delete `apps/api/src/auth/` module
+  - [x] Delete `apps/api/src/users/` module
+  - [x] Remove auth dependencies
 
-- [ ] **Simplify app structure**
-  - [ ] Update `apps/api/src/app.module.ts` (keep SpeedTestModule only)
-  - [ ] Update `apps/api/src/main.ts` (remove DB/auth config)
+- [x] **Simplify app structure**
+  - [x] Update `apps/api/src/app.module.ts` (keep SpeedTestModule only)
+  - [x] Update `apps/api/src/main.ts` (remove DB/auth config)
 
 - [x] **Speed Test Endpoints** (already implemented)
   - [x] `GET /api/download` - Stream random data
