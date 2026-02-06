@@ -1,0 +1,24 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose
+  - git
+  - curl
+
+write_files:
+  - path: /root/setup-staging.sh
+    permissions: "0755"
+    content: |
+      #!/bin/bash
+      cd /root
+      if [ ! -d "internet-test-speed" ]; then
+        git clone https://github.com/jetsadapd60/internet-test-speed.git
+      fi
+      cd internet-test-speed
+      # You should set your .env here in a real scenario
+      # For now using provided database connection strings
+      docker-compose -f docker-compose.full.yml up --build -d
+
+runcmd:
+  - [sh, /root/setup-staging.sh]

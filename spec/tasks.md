@@ -24,7 +24,7 @@
 
 - [x] **CI Pipeline:** สร้าง GitHub Actions workflow สำหรับ Run Test & Lint
 - [x] **Containerization:** เขียน `Dockerfile` สำหรับ Web Client และ Backend Service
-- [ ] **Vercel/Cloud Init:** Setup Project บน Hosting Platform (Staging Env)
+- [x] **Vercel/Cloud Init:** Setup Project บน Hosting Platform (Staging Env)
 
 ---
 
