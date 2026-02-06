@@ -9,8 +9,8 @@ services:
       NODE_ENV: production
     ports:
       - "${API_PORT:-3010}:3000"
-    command: node apps/api/dist/src/main
     restart: always
+
 
   web:
     build:
