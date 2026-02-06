@@ -43,11 +43,8 @@ if [ ! -f "apps/api/.env" ]; then
 fi
 
 # Create .env for docker-compose variable substitution
-# Determine protocol based on existing SSL or user preference
+# Use HTTP for now to avoid SSL certificate issues
 PROTOCOL="http"
-if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
-    PROTOCOL="https"
-fi
 
 echo "NEXT_PUBLIC_API_URL=${PROTOCOL}://${DOMAIN}" > .env
 echo "NEXT_PUBLIC_ENGINE_URL=${PROTOCOL}://${DOMAIN}" >> .env
