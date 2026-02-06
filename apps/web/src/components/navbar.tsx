@@ -33,13 +33,6 @@ export function Navbar() {
             <History className="h-4 w-4" />
             History
           </Link>
-          <Link
-            href="/profile"
-            className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${isActive("/profile") ? "text-primary" : "text-slate-400"}`}
-          >
-            <User className="h-4 w-4" />
-            Profile
-          </Link>
         </div>
       </div>
     </nav>

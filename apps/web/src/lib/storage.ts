@@ -1,8 +1,8 @@
 export interface TestResult {
   id: string;
   timestamp: number;
-  downloadSpeed: number;
-  uploadSpeed: number;
+  download: number;
+  upload: number;
   ping: number;
   jitter: number;
   healthScore: number;
@@ -119,8 +119,8 @@ export const storage = {
       return [
         dateStr,
         timeStr,
-        result.downloadSpeed.toFixed(2),
-        result.uploadSpeed.toFixed(2),
+        result.download.toFixed(2),
+        result.upload.toFixed(2),
         result.ping.toFixed(2),
         result.jitter.toFixed(2),
         result.healthScore,

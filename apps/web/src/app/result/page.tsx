@@ -71,7 +71,7 @@ function ResultContent() {
       const jitter = parseFloat(jitterParam);
       const healthScore = calculateHealthScore(download, upload, ping, jitter);
 
-      setResult({
+      const newResult: TestResult = {
         id: Date.now().toString(),
         timestamp: Date.now(),
         download,
@@ -79,25 +79,14 @@ function ResultContent() {
         ping,
         jitter,
         healthScore,
-      });
+      };
 
-      // Save to localStorage for history
-      const history = JSON.parse(
-        localStorage.getItem("speedtest_history") || "[]",
-      );
-      history.unshift({
-        id: Date.now().toString(),
-        timestamp: Date.now(),
-        download,
-        upload,
-        ping,
-        jitter,
-        healthScore,
+      setResult(newResult);
+
+      // Save to localStorage using storage service
+      import("@/lib/storage").then(({ storage }) => {
+        storage.saveResult(newResult);
       });
-      localStorage.setItem(
-        "speedtest_history",
-        JSON.stringify(history.slice(0, 20)),
-      ); // Keep last 20
     }
   }, [searchParams]);
 

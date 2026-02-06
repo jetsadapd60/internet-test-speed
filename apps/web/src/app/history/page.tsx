@@ -6,41 +6,15 @@ import { Download, Upload, Activity, Timer, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/confirm-modal";
 
-interface TestResult {
-  id: string;
-  timestamp: number;
-  download: number;
-  upload: number;
-  ping: number;
-  jitter: number;
-  healthScore: number;
-}
+import { storage, type TestResult } from "@/lib/storage";
 
 export default function HistoryPage() {
   const router = useRouter();
   const [history, setHistory] = useState<TestResult[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("speedtest_history");
-    if (stored) {
-      try {
-        const parsed: TestResult[] = JSON.parse(stored);
-        // Deduplicate by ID to fix "same key" error
-        const unique = parsed.filter(
-          (item, index, self) =>
-            index === self.findIndex((t) => t.id === item.id),
-        );
-        setHistory(unique);
-
-        // If duplicates were found, clean up localStorage
-        if (unique.length !== parsed.length) {
-          localStorage.setItem("speedtest_history", JSON.stringify(unique));
-        }
-      } catch (e) {
-        console.error("Failed to parse history", e);
-        setHistory([]);
-      }
-    }
+    // Load history from storage service
+    setHistory(storage.getHistory());
   }, []);
 
   /* Modal State */
@@ -58,12 +32,11 @@ export default function HistoryPage() {
 
   const confirmAction = () => {
     if (modalConfig.type === "clear") {
-      localStorage.removeItem("speedtest_history");
+      storage.clearAll();
       setHistory([]);
     } else if (modalConfig.type === "delete" && modalConfig.itemId) {
-      const updated = history.filter((item) => item.id !== modalConfig.itemId);
-      setHistory(updated);
-      localStorage.setItem("speedtest_history", JSON.stringify(updated));
+      storage.deleteResult(modalConfig.itemId);
+      setHistory(storage.getHistory());
     }
     setModalOpen(false);
   };
@@ -115,16 +88,36 @@ export default function HistoryPage() {
               View your past speed test results
             </p>
           </div>
-          {history.length > 0 && (
-            <Button
-              variant="outline"
-              onClick={handleClearClick}
-              className="gap-2 text-red-400 hover:text-red-300"
-            >
-              <Trash2 className="h-4 w-4" />
-              Clear All
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {history.length > 0 && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => storage.downloadCSV()}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  CSV
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => storage.downloadJSON()}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  JSON
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleClearClick}
+                  className="gap-2 text-red-400 hover:text-red-300"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Clear All
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* History Table */}
