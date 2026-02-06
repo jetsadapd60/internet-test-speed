@@ -91,17 +91,19 @@ $DOCKER_CMD -f docker-compose.full.yml up --build -d
 echo "🕒 Waiting for API to be fully ready (Running Migrations & Starting Up)..."
 SUCCESS=0
 for i in {1..60}; do
-    if $DOCKER_CMD -f docker-compose.full.yml logs api | grep -q "API is running"; then
-        echo "✨ API is LIVE and ready!"
+    LOGS=$($DOCKER_CMD -f docker-compose.full.yml logs --tail=1 api)
+    if echo "$LOGS" | grep -qi "api is running"; then
+        echo -e "\n✨ API is LIVE and ready!"
         SUCCESS=1
         break
     fi
-    echo -n "."
+    # Show progress from logs
+    echo -ne "\r⏳ [Attempt $i/60] Status: ${LOGS:0:60}..."
     sleep 2
 done
 
 if [ $SUCCESS -eq 0 ]; then
-    echo -e "\n❌ API failed to start within 120 seconds. Please check logs:"
+    echo -e "\n❌ API failed to start within 120 seconds. Latest logs:"
     $DOCKER_CMD -f docker-compose.full.yml logs --tail=50 api
     exit 1
 fi
