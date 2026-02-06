@@ -65,18 +65,13 @@ fi
 
 # 7. Generate Production Env with correct Protocol
 echo "⚙️  Finalizing Environment (Protocol: $PROTOCOL)..."
-JWT_SECRET=$(openssl rand -base64 32)
 echo "NEXT_PUBLIC_API_URL=${PROTOCOL}://${DOMAIN}" > .env
 echo "NEXT_PUBLIC_ENGINE_URL=${PROTOCOL}://${DOMAIN}" >> .env
 echo "API_PORT=${API_PORT}" >> .env
 echo "WEB_PORT=${WEB_PORT}" >> .env
-echo "JWT_SECRET=${JWT_SECRET}" >> .env
 
-# Clear and update API env
-if [ ! -f "apps/api/.env" ]; then
-    cp apps/api/.env.example apps/api/.env
-    sed -i "s/your_secret_key_here/${JWT_SECRET}/g" apps/api/.env
-fi
+# API env is no longer needed (no database/auth)
+rm -f apps/api/.env
 
 # 8. Start/Restart Platform
 echo "🐳 Deploying Containers..."
@@ -88,7 +83,7 @@ fi
 $DOCKER_CMD -f docker-compose.full.yml down --remove-orphans || true
 $DOCKER_CMD -f docker-compose.full.yml up --build -d
 
-echo "🕒 Waiting for API to be fully ready (Running Migrations & Starting Up)..."
+echo "🕒 Waiting for API to be fully ready..."
 SUCCESS=0
 for i in {1..60}; do
     LOGS=$($DOCKER_CMD -f docker-compose.full.yml logs --tail=1 api)
